@@ -1,0 +1,29 @@
+using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
+
+public class VRControllerInput : MonoBehaviour
+{
+    public XRController controller; // Assign your XR Controller in the inspector
+    public GameObject objectToMove;  // The object you want to move
+    public float moveSpeed = 1.0f;   // Speed of the object movement
+
+    void Update()
+    {
+        // Check for button press (e.g., Select button)
+        if (controller.selectInteractionState.activatedThisFrame)
+        {
+            Debug.Log("Select button pressed");
+            MoveObject();
+        }
+    }
+
+    void MoveObject()
+    {
+        // Move the object forward in the direction the controller is pointing
+        if (objectToMove != null)
+        {
+            Vector3 moveDirection = controller.transform.forward; // Get the forward direction of the controller
+            objectToMove.transform.position += moveDirection * moveSpeed * Time.deltaTime;
+        }
+    }
+}
