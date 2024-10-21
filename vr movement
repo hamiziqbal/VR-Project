@@ -1,0 +1,58 @@
+using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
+
+public class VRCharacterController : MonoBehaviour
+{
+    public XRNode inputSource; // Input source (Left or Right controller)
+    public float speed = 1.0f; // Movement speed
+    public float rotationSpeed = 5.0f; // Rotation speed
+
+    private XRRig rig;
+    private CharacterController characterController;
+
+    void Start()
+    {
+        rig = GetComponent<XRRig>();
+        characterController = gameObject.AddComponent<CharacterController>();
+    }
+
+    void Update()
+    {
+        Vector2 inputAxis = GetAxis(inputSource);
+        Move(inputAxis);
+        Rotate();
+    }
+
+    private Vector2 GetAxis(XRNode node)
+    {
+        InputDevice device = InputDevices.GetDeviceAtXRNode(node);
+        Vector2 axisValue;
+        device.TryGetFeatureValue(CommonUsages.primary2DAxis, out axisValue);
+        return axisValue;
+    }
+
+    private void Move(Vector2 inputAxis)
+    {
+        Vector3 direction = new Vector3(inputAxis.x, 0, inputAxis.y);
+        direction = rig.transform.TransformDirection(direction);
+        characterController.Move(direction * speed * Time.deltaTime);
+    }
+
+    private void Rotate()
+    {
+        float rotationInput = 0.0f;
+        InputDevice device = InputDevices.GetDeviceAtXRNode(inputSource);
+        device.TryGetFeatureValue(CommonUsages.primary2DAxisClick, out bool isPressed);
+
+        if (isPressed)
+        {
+            rotationInput = Input.GetAxis("Horizontal"); // You might want to change this to a specific input for your VR setup
+        }
+
+        if (rotationInput != 0)
+        {
+            Vector3 rotation = new Vector3(0, rotationInput * rotationSpeed, 0);
+            rig.transform.Rotate(rotation);
+        }
+    }
+}
